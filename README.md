@@ -1,7 +1,7 @@
-# crypto-crawler
+## crypto-crawler
 crypto currency data parser thing
 
-#yo! set up / install:
+##yo! set up / install:
 
 set up virtual environment (these are unix/linux instructions, but they should be similar)
   1. pip install virtualenv
