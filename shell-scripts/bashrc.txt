@@ -1,0 +1,35 @@
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+
+alias arduino-legacy="/home/llom2600/arduino-legacy/arduino"
+alias edit="/usr/local/bin/notepadqq"
+alias sudo="sudo "
+
+#venv stuff
+flask_work="/home/llom2600/web-services/flask-examples"
+
+#alias for virtual environment switching
+workon(){
+source /home/llom2600/helper-scripts/shell-scripts/workon.sh $1
+source $venv_path
+cd $flask_work
+}
+
+QT_SELECT="5-64"
+QTTOOLDIR="/usr/lib64/qt5/bin"
+QTLIBDIR="/usr/lib64/qt5"
+
+
+export QT_SELECT
+export QTTOOLDIR
+export QTLIBDIR
+export flask_work
