@@ -11,8 +11,9 @@ set up virtual environment (these are unix/linux instructions, but they should b
 ***
   
 then go to cloned project directory and run:
+***
   4. pip install -r requirements.txt (in / of project)
-  
+***
 before working each time, you gotta run (3) to ensure you're working in the proper virtual environment. i encapsulated this in a 
 venv because i have so much shit installed in my normal python environment that it gets cluttered and confusing. sorry about that. we can write some shell scripts if it gets annoying. i made a shell scripts folder for those just in case. 
   
