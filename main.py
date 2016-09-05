@@ -63,23 +63,33 @@ def parse_source_line(line):
 def main():
 	source = load_sources()			#load an external list with the urls we want to crawl
 	
-	#get_source(source_list[0])
+	#get search parameters for the second source, which is coinIO
 	test_chain = pc.load_chain(source[1]["hash"])
 	
+	#pull first search string, which is for market cap value
 	market_cap_search = test_chain[0].split(":",1)
+	
+	#pull to and from keys
 	search_keys = market_cap_search[0].split(',')
 	
+	#divide those up
 	search_in_key = search_keys[0].strip()
 	result_to_key = search_keys[1].strip()
 	
+	#store search string regular expression
 	search_string = market_cap_search[1]
 	
+	#define result dictionary
 	test_result = {}
+	
+	#construct URL
 	url = "http://" + source[1]["host"] + source[1]["page"]
 	
+	# create and make requests
 	req = urllib2.Request(url, headers={'User-Agent' : "Magic Browser"}) 
 	response = urllib2.urlopen( req )
-	test_result["response"] = response.read()
+	
+	test_result[search_in_key] = response.read()
 	
 	search = re.compile(search_string)
 	test_result[result_to_key] = re.findall(search_string, test_result[search_in_key])
