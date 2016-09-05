@@ -1,7 +1,8 @@
 import os
 import sys
 import hashlib
-
+import urllib2
+import re
 
 # add paths to search space, to make importing modules and data sets easier
 sys.path.append('./modules')
@@ -10,6 +11,7 @@ sys.path.append('./data-sets')
 from session import sesh
 import util
 import parse_chain as pc
+
 
 #global constants
 source_file = "sources.lst"
@@ -59,11 +61,29 @@ def parse_source_line(line):
 
 #entry point
 def main():
-	source_list = load_sources()			#load an external list with the urls we want to crawl
+	source = load_sources()			#load an external list with the urls we want to crawl
 	
 	#get_source(source_list[0])
-	test_chain = pc.load_chain(source_list[0]["hash"])
-	print test_chain
+	test_chain = pc.load_chain(source[1]["hash"])
 	
+	market_cap_search = test_chain[0].split(":",1)
+	search_keys = market_cap_search[0].split(',')
+	
+	search_in_key = search_keys[0].strip()
+	result_to_key = search_keys[1].strip()
+	
+	search_string = market_cap_search[1]
+	
+	test_result = {}
+	url = "http://" + source[1]["host"] + source[1]["page"]
+	
+	req = urllib2.Request(url, headers={'User-Agent' : "Magic Browser"}) 
+	response = urllib2.urlopen( req )
+	test_result["response"] = response.read()
+	
+	search = re.compile(search_string)
+	test_result[result_to_key] = re.findall(search_string, test_result[search_in_key])
+	
+	print test_result[result_to_key]
 	
 if __name__ == "__main__": main()
