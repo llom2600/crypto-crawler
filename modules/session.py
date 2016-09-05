@@ -103,8 +103,7 @@ class sesh(object):
 
 		self.is_connected = True		#set flag for successfully connected
 		self.socket_cert = self.s.getpeercert()
-	
-	
+
 	
 	def get(self, path):
 		#reset response variables
@@ -169,7 +168,4 @@ class sesh(object):
 		if (self.is_connected):
 			print "Closing connection to ", self.host
 			self.s.close()
-			self.is_connected = False
-		
-				
-				
+			self.is_connected = False	

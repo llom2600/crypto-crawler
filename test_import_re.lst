@@ -1,0 +1,24 @@
+#comments look like this
+#so to load the parsing rules for a specific source, use load_chain(source["hash"]) and it returns a list of search parameters as a list
+#still need to add parsing for the actual search rules
+
+#host,coincap.io,port,80,page,/front
+31c34fe28236e6210bb217425acb038d41dd6809 
+{
+page:
+test:
+some:
+thing:
+to:
+get:
+}
+
+#host,www.coinwarz.com,port,80,page,/cryptocurrency 
+fe0a6bcc2560fe02501682705d2226427bc7fc93
+{
+some:
+thing:
+to:
+search:
+for:
+}

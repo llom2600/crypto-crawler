@@ -1,1 +1,2 @@
 host,www.coinwarz.com,port,80,page,/cryptocurrency
+host,coincap.io,port,80,page,/front
