@@ -28,7 +28,7 @@ def load_chain(key = None):
 				isOpenBlock = True				
 			elif search_close_block and isOpenBlock == True:
 				isOpenBlock = False
-			elif isOpenBlock == False and search_comment:
+			elif search_comment:
 				currentLine = currentLine.strip('\n')
 				search_dict["comments"].append(currentLine)
 			else:
