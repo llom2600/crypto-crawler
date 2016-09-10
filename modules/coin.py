@@ -1,3 +1,5 @@
+import re
+
 #list of supported cryptocoins
 coin_names = [
 "BTC",
@@ -24,12 +26,21 @@ class coin(object):
 	
 	def update(self, new_data):
 		""" get new data for this coin type, this is gonna have to be more robust to handle other types of data, but for now it'll do """
-		self.coin_properties = {}
+		numeric = re.compile(r'\-?[0-9]+\.?[0-9]*')				#set RE for 
+		
 		iter_data = new_data[self.coin_name].split(',')
 		for i in range(len(iter_data)):
 			key, value = iter_data[i].split(':')
-			self.coin_properties[key.strip('"')] = value.strip('"')
-
+			
+			key = key.strip('"')
+			value = value.strip('"')
+			
+			#if the property in question looks like a numeric value, cast it to a float
+			is_numeric = re.search(numeric, value)
+			if is_numeric:
+				value = float(value)
+				
+			self.coin_properties[key] = value
 			
 	def summary(self):
 		print "-----------", self.coin_name, " summary ------------"

@@ -119,9 +119,12 @@ def main():
 	print "Current btc price:", btc["price"]
 	print "Current eth price:", eth["price"]
 	print "Current xmr price:", xmr["price"]
+	
+	print "Comparison test:", btc["price"] > eth["price"]
+	print "Comparison test:", btc["price"] < eth["price"]
 
 	#you can also print a summary... this may be retarded but for testing purposes, whatever
-	btc.summary()
+	eth.summary()
 	
 	new_data = run_parse_chain(source[1])		#get some new data from a source
 	btc.update(new_data)								    #update data
