@@ -16,7 +16,6 @@ import parse_chain as pc
 #global constants
 source_file = "sources.lst"
 
-
 #global objects, if we need later
 
 
@@ -64,8 +63,9 @@ def run_parse_chain(source):
 	response = get_raw_data(source)									#get raw data from source
 	new_data["response"] = response									#set new data key to initial response data
 	
+	#print new_data["response"]
+	
 	for i in range(len(current_chain)):									#go through list of search strings and find the data we want, then store it in new_data dictionary
-		
 		parsed_link = current_chain[i].split(':', 1)			
 		key_from, key_to = parsed_link[0].split(',')
 		search_string = parsed_link[1].strip()
@@ -74,17 +74,26 @@ def run_parse_chain(source):
 		key_from = key_from.strip()
 		
 		current_re = re.compile(search_string)
-		current_result = re.findall(current_re, new_data[key_from])
+		
+		if type(new_data[key_from]) == str:
+			current_result = re.findall(current_re, new_data[key_from])
+		elif type(new_data[key_from]) == list:
+			for i in range(len(new_data[key_from])):
+				current_result = re.search(current_re, new_data[key_from][i])
+				if current_result:
+					break
+					
 		if current_result:
-			new_data[key_to] = current_result
-			print new_data[key_to]
+			if type(current_result) ==  list:
+				new_data[key_to] = current_result
+			else:
+				new_data[key_to] = current_result.group(0)
 			found_data = True
 			
 	if found_data:
 		return new_data
 	else: 
 		return None
-
 
 def get_raw_data(source):
 	request_url = "http://" + source["host"] + source["page"]
@@ -93,12 +102,13 @@ def get_raw_data(source):
 		req_handle = urllib2.urlopen( req )
 		response = req_handle.read()
 	except Exception as e:
-		print "Problem opening source ", source["host"]
+		print "Problem opening source: ", source["host"]
 	return response
 	
 #entry point
 def main():
-	source = load_sources()			#load an external list with the urls we want to crawl
-	run_parse_chain(source[1])		#this is how easy it will be to get data from a source!!!! run it!
+	source = load_sources()				#load an external list with the urls we want to crawl
+	new_data = run_parse_chain(source[1])		#this is how easy it will be to get data from a source!!!! run it!
+	print new_data["bitcoin"]
 	
 if __name__ == "__main__": main()
