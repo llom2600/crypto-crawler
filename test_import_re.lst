@@ -7,7 +7,9 @@
 31c34fe28236e6210bb217425acb038d41dd6809 
 {
 response, coin_list: [\{]([^\}]+)[\}]
-coin_list, bitcoin: ".+short"[\:]"(ETH).+"
+coin_list, BTC: ".+short"[\:]"(BTC).+"
+coin_list, ETH: ".+short"[\:]"(ETH).+"
+coin_list, XMR: ".+short"[\:]"(XMR).+"
 }
 
 #host,www.coinwarz.com,port,80,page,/cryptocurrency 

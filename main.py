@@ -109,6 +109,10 @@ def get_raw_data(source):
 def main():
 	source = load_sources()				#load an external list with the urls we want to crawl
 	new_data = run_parse_chain(source[1])		#this is how easy it will be to get data from a source!!!! run it!
-	print new_data["bitcoin"]
+	print new_data["BTC"],"\n"
+	print new_data["ETH"],"\n"
+	print new_data["XMR"],"\n"
+
+
 	
 if __name__ == "__main__": main()
