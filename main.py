@@ -8,9 +8,9 @@ import re
 sys.path.append('./modules')
 sys.path.append('./data-sets')
 
-from session import sesh
 import util
 import parse_chain as pc
+from coin import *
 
 
 #global constants
@@ -107,12 +107,25 @@ def get_raw_data(source):
 	
 #entry point
 def main():
-	source = load_sources()				#load an external list with the urls we want to crawl
+	source = load_sources()								   #load an external list with the urls we want to crawl
 	new_data = run_parse_chain(source[1])		#this is how easy it will be to get data from a source!!!! run it!
-	print new_data["BTC"],"\n"
-	print new_data["ETH"],"\n"
-	print new_data["XMR"],"\n"
+	
+	btc = coin("BTC", new_data)						#upon creation, pass in current coin data from running parse chain
+	eth = coin("ETH", new_data)						
+	xmr = coin("XMR", new_data)						
 
+	
+	#so now you can call a property of a coin, like this
+	print "Current btc price:", btc["price"]
+	print "Current eth price:", eth["price"]
+	print "Current xmr price:", xmr["price"]
 
+	#you can also print a summary... this may be retarded but for testing purposes, whatever
+	btc.summary()
+	
+	new_data = run_parse_chain(source[1])		#get some new data from a source
+	btc.update(new_data)								    #update data
+	
+	
 	
 if __name__ == "__main__": main()

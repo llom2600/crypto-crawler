@@ -7,15 +7,12 @@
 31c34fe28236e6210bb217425acb038d41dd6809 
 {
 response, coin_list: [\{]([^\}]+)[\}]
-coin_list, BTC: ".+short"[\:]"(BTC).+"
-coin_list, ETH: ".+short"[\:]"(ETH).+"
-coin_list, XMR: ".+short"[\:]"(XMR).+"
+coin_list, BTC: .+"short"[\:]"(BTC)".+
+coin_list, ETH: .+"short"[\:]"(ETH)".+
+coin_list, XMR: .+"short"[\:]"(XMR)".+
 }
 
 #host,www.coinwarz.com,port,80,page,/cryptocurrency 
 fe0a6bcc2560fe02501682705d2226427bc7fc93
 {
 }
-
-
-"shapeshift":false,"position24":"458","position":"458","short":"ARI","long":"Aricoin","time":1473276092131,"price":"0.0000806478","perc":"3.32","volume":"0.859275","usdVolume":"0.859275","cap24hrChange":"3.32","mktcap":"11311.8624613","supply":"140262505","published":false,"vwapData":"0.0000806478"
