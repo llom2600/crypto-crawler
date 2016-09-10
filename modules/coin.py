@@ -6,18 +6,21 @@ coin_names = [
 ]
 
 class coin(object):
-	def __init__(self, coin_name, new_data):
-		if coin_name in coin_names:
+	def __init__(self, coin_name, new_data = None):
+		if coin_name in coin_names and new_data:
 			print "Created ", coin_name, " instance."
 			self.coin_name = coin_name
 			self.coin_properties = {}
 			self.update(new_data)
 		else:
-			print "Coin type does not exist."
+			print "Error creating new coin, did you pass in new data?"
 			return None
+	
 	
 	def __getitem__(self, key):
 		return self.coin_properties[key]
+	"""allows you to get properties of a coin instance like a dictionary"""
+	
 	
 	def update(self, new_data):
 		""" get new data for this coin type, this is gonna have to be more robust to handle other types of data, but for now it'll do """
@@ -26,8 +29,8 @@ class coin(object):
 		for i in range(len(iter_data)):
 			key, value = iter_data[i].split(':')
 			self.coin_properties[key.strip('"')] = value.strip('"')
-		#print self.coin_properties
-	
+
+			
 	def summary(self):
 		print "-----------", self.coin_name, " summary ------------"
 		for key, value in self.coin_properties.iteritems():
@@ -36,7 +39,7 @@ class coin(object):
 
 	def inventory(self):
 		pass
-	""" return current amount we have of this coin """
+	""" return current amount we have of this coin (i kinda wanna pass in a csv of wallet addresses for each coin type or something) """
 	
 def main():
 	bitcoin = coin("BTC")
