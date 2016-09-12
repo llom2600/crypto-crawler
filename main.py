@@ -3,14 +3,16 @@ import sys
 import hashlib
 import urllib2
 import re
+import time
 
 # add paths to search space, to make importing modules and data sets easier
 sys.path.append('./modules')
 sys.path.append('./data-sets')
 
-import util
+from util import *
 import parse_chain as pc
 from coin import *
+from shapeshift import *
 
 
 #global constants
@@ -60,7 +62,8 @@ def run_parse_chain(source):
 	found_data = False
 	
 	current_chain = pc.load_chain(source["hash"])			#load the current parse chain for the target source
-	response = get_raw_data(source)									#get raw data from source
+	response = get_raw_data(source["host"] + ":" + source["port"], source["page"])									#get raw data from source
+	new_data["source"] = source
 	new_data["response"] = response									#set new data key to initial response data
 	
 	#print new_data["response"]
@@ -95,15 +98,6 @@ def run_parse_chain(source):
 	else: 
 		return None
 
-def get_raw_data(source):
-	request_url = "http://" + source["host"] + source["page"]
-	req = urllib2.Request(request_url, headers={'User-Agent' : "Magic Browser"}) 
-	try:
-		req_handle = urllib2.urlopen( req )
-		response = req_handle.read()
-	except Exception as e:
-		print "Problem opening source: ", source["host"]
-	return response
 	
 #entry point
 def main():
@@ -112,23 +106,19 @@ def main():
 	
 	btc = coin("BTC", new_data)						#upon creation, pass in current coin data from running parse chain
 	eth = coin("ETH", new_data)						
-	xmr = coin("XMR", new_data)						
-
-	
-	#so now you can call a property of a coin, like this
-	print "Current btc price:", btc["price"]
-	print "Current eth price:", eth["price"]
-	print "Current xmr price:", xmr["price"]
-	
-	print "Comparison test:", btc["price"] > eth["price"]
-	print "Comparison test:", btc["price"] < eth["price"]
-
-	#you can also print a summary... this may be retarded but for testing purposes, whatever
-	eth.summary()
+	xmr = coin("XMR", new_data)		
+	exc = exchange()										#class wrapper for shapeshift api
 	
 	new_data = run_parse_chain(source[1])		#get some new data from a source
 	btc.update(new_data)								    #update data
 	
+	#to make an api call, specify the path of api call (see below), followed by the pair of coins
+	exc["rate", "btc_ltc"]
+	exc["limit", "btc_ltc"]
+	exc["marketinfo", "btc_ltc"]
 	
+	#if no pair is specified, it gets all pair info
+	#exc["rate"]
+
 	
 if __name__ == "__main__": main()

@@ -26,7 +26,8 @@ class coin(object):
 	
 	def update(self, new_data):
 		""" get new data for this coin type, this is gonna have to be more robust to handle other types of data, but for now it'll do """
-		numeric = re.compile(r'\-?[0-9]+\.?[0-9]*')				#set RE for 
+		#print "Updating data from: ", new_data["source"]
+		numeric = re.compile(r'\-?[0-9]+\.?[0-9]*')				
 		
 		iter_data = new_data[self.coin_name].split(',')
 		for i in range(len(iter_data)):

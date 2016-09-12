@@ -1,7 +1,7 @@
 import re
 import numpy
 
-PARSE_CHAIN_FILE = "test_import_re.lst"
+PARSE_CHAIN_FILE = "parsing_rules.lst"
 
 def load_chain(key = None):
 	hash_key = re.compile(r'^[a-f0-9]{40}')
