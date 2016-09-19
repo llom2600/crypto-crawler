@@ -1,4 +1,5 @@
 import re
+import ast
 
 #list of supported cryptocoins
 coin_names = [
@@ -7,13 +8,23 @@ coin_names = [
 "XMR"
 ]
 
+#used for proper eval
+true = True
+false = False
+
 class coin(object):
-	def __init__(self, coin_name, new_data = None):
-		if coin_name in coin_names and new_data:
+	def __init__(self, coin_name, new_data = None, subset = []):
+		if coin_name in coin_names:
 			print "Created ", coin_name, " instance."
 			self.coin_name = coin_name
 			self.coin_properties = {}
-			self.update(new_data)
+			
+			self.coin_properties["name"] = self.coin_name
+			self.coin_properties["subset"] = subset
+			self._loadwallets()				#load csv with current wallet addresses for this coin type and update inventory
+			
+			if new_data != None:
+				self.update(new_data)
 		else:
 			print "Error creating new coin, did you pass in new data?"
 			return None
@@ -27,20 +38,30 @@ class coin(object):
 	def update(self, new_data):
 		""" get new data for this coin type, this is gonna have to be more robust to handle other types of data, but for now it'll do """
 		#print "Updating data from: ", new_data["source"]
-		numeric = re.compile(r'\-?[0-9]+\.?[0-9]*')				
+		numeric = re.compile(r'^\-?[0-9]+\.?[0-9]*')				
+		iter_data = new_data[self.coin_name]
 		
-		iter_data = new_data[self.coin_name].split(',')
+		#temporary fix to eval bug i've been having with AST literal_eval
+		if type(iter_data) == list:
+			iter_data = iter_data[0]
+
+		#clean up formatting
+		iter_data = iter_data.strip('{')
+		iter_data = iter_data.rstrip('}')
+		iter_data = iter_data.split(',"')
+			
 		for i in range(len(iter_data)):
-			key, value = iter_data[i].split(':')
-			
+			key, value = iter_data[i].split(':')						
 			key = key.strip('"')
+			key = key.rstrip('"')
 			value = value.strip('"')
-			
+			value = value.rstrip('"')
+
 			#if the property in question looks like a numeric value, cast it to a float
 			is_numeric = re.search(numeric, value)
 			if is_numeric:
 				value = float(value)
-				
+			
 			self.coin_properties[key] = value
 			
 	def summary(self):
@@ -49,9 +70,12 @@ class coin(object):
 			print key, ":", value
 		print "----------------------------------"
 
-	def inventory(self):
+	def _inventory(self):
 		pass
 	""" return current amount we have of this coin (i kinda wanna pass in a csv of wallet addresses for each coin type or something) """
+	
+	def _loadwallets(self):
+		pass
 	
 def main():
 	bitcoin = coin("BTC")

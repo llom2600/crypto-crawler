@@ -1,2 +1,5 @@
-host,www.coinwarz.com,port,80,page,/cryptocurrency
 host,coincap.io,port,80,page,/front
+host,whattomine.com,port,443,page,/coins/1.json
+host,whattomine.com,port,443,page,/coins/151.json
+host,whattomine.com,port,443,page,/coins/101.json
+host,www.coinwarz.com,port,80,page,/cryptocurrency

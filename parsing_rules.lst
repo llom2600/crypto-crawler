@@ -1,16 +1,39 @@
-#comments look like this
-
 #so to load the parsing rules for a specific source, use load_chain(source["hash"]) and it returns a list of search parameters as a list
 #still need to add parsing for the actual search rules
 
 #host,coincap.io,port,80,page,/front
 31c34fe28236e6210bb217425acb038d41dd6809 
 {
-response, coin_list: [\{]([^\}]+)[\}]
-coin_list, BTC: .+"short"[\:]"(BTC)".+
-coin_list, ETH: .+"short"[\:]"(ETH)".+
-coin_list, XMR: .+"short"[\:]"(XMR)".+
+response, coin_list: (\{[^\}]+\})
+coin_list, BTC: (\{[^\}]+"(BTC)"[^\}]+\})
+coin_list, ETH: (\{[^\}]+"(ETH)"[^\}]+\})
+coin_list, XMR: (\{[^\}]+"(XMR)"[^\}]+\})
 }
+
+
+#below are some temporary sources for mining difficulty data
+
+#bitcoin - BTC
+#host,whattomine.com,443,page,/coins/1.json
+a5ba8f48c8dbad5b97fc2cfb8c6b24b900d72d27
+{
+response, BTC:(\{.+\})
+}
+
+#etherium - ETH
+#host,whattomine.com,443,page,/coins/151.json
+b7c26f7c3c7cc5a405078b5b9272cb19abd29ffb
+{
+response, ETH:(\{.+\})
+}
+
+#monero - XMR
+#host,whattomine.com,443,page,/coins/101.json
+8431012e1b7172f6ed2f79cda1b5fb196c8f14f0
+{
+response, XMR:(\{.+\})
+}
+
 
 #host,www.coinwarz.com,port,80,page,/cryptocurrency 
 fe0a6bcc2560fe02501682705d2226427bc7fc93

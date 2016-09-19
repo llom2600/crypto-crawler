@@ -1,9 +1,6 @@
-import os
-import sys
+import os, sys, time, re
 import hashlib
 import urllib2
-import re
-import time
 
 # add paths to search space, to make importing modules and data sets easier
 sys.path.append('./modules')
@@ -62,11 +59,10 @@ def run_parse_chain(source):
 	found_data = False
 	
 	current_chain = pc.load_chain(source["hash"])			#load the current parse chain for the target source
-	response = get_raw_data(source["host"] + ":" + source["port"], source["page"])									#get raw data from source
+	response = get_raw_data(source["host"] + ":" + source["port"], source["page"])						#get raw data from source
 	new_data["source"] = source
 	new_data["response"] = response									#set new data key to initial response data
 	
-	#print new_data["response"]
 	
 	for i in range(len(current_chain)):									#go through list of search strings and find the data we want, then store it in new_data dictionary
 		parsed_link = current_chain[i].split(':', 1)			
@@ -98,27 +94,58 @@ def run_parse_chain(source):
 	else: 
 		return None
 
+
+def updateCoinData(coin, sources, subset=[]):
+	if subset == []:
+		for i in range(1, len(sources)):
+			print sources[i]
+			new_data = run_parse_chain(sources[i])
+			coin.update(new_data)
+	else:
+		for i in (coin["subset"]):
+			new_data = run_parse_chain(sources[i])
+			coin.update(new_data)
+		
+	
+def updateCoinList (coinList, sources):
+	for i in range(len(coinList)):
+		print "Updating ", coinList[i]["name"], " data..."
+		updateCoinData(coinList[i], sources, coinList[i]["subset"])
+	
 	
 #entry point
 def main():
-	source = load_sources()								   #load an external list with the urls we want to crawl
-	new_data = run_parse_chain(source[1])		#this is how easy it will be to get data from a source!!!! run it!
+	sources = load_sources()								  #load an external list with the urls we want to crawl
+	#print sources
 	
-	btc = coin("BTC", new_data)						#upon creation, pass in current coin data from running parse chain
-	eth = coin("ETH", new_data)						
-	xmr = coin("XMR", new_data)		
+	# subset specifies the indices of sources that each coin type will pull new data from
+	# it sucks, i know. i'm working on a better system
+	
+	btc = coin("BTC", subset = [0,1])						#upon creation, pass in current coin data from running parse chain
+	eth = coin("ETH", subset = [0,2])						
+	xmr = coin("XMR", subset = [0,3])		
+	
+	#create list to store all coins we are working with
+	coinList = [btc, eth, xmr]
+	
+	#update all coin data from whatever sources they are set up to pull from
+	updateCoinList(coinList, sources)
+	
+	btc.summary()
+	#eth.summary()
+	#xmr.summary()
+	
+	#create exchange instance for trading
 	exc = exchange()										#class wrapper for shapeshift api
 	
-	new_data = run_parse_chain(source[1])		#get some new data from a source
-	btc.update(new_data)								    #update data
-	
 	#to make an api call, specify the path of api call (see below), followed by the pair of coins
+	#sample shapeshift api calls
+	'''
 	exc["rate", "btc_ltc"]
 	exc["limit", "btc_ltc"]
 	exc["marketinfo", "btc_ltc"]
-	
+	'''
 	#if no pair is specified, it gets all pair info
 	#exc["rate"]
 
-	
 if __name__ == "__main__": main()
