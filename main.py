@@ -1,5 +1,6 @@
-import os, sys, time, re
-import hashlib
+import os, sys, re
+import sched, time
+from threading import Thread
 import urllib2
 
 # add paths to search space, to make importing modules and data sets easier
@@ -7,115 +8,55 @@ sys.path.append('./modules')
 sys.path.append('./data-sets')
 
 from util import *
-import parse_chain as pc
 from coin import *
 from shapeshift import *
 
-
 #global constants
 source_file = "sources.lst"
+run_limit = 30.0					#time to pull data in seconds
 
-#global objects, if we need later
+#global objects
+sources = None
+coinList = None
+exc = None
 
-
-# load in a list of web pages with data that we want
-def load_sources():
-	source_list = []
-	with open(source_file, 'r') as f:
-		for line in f:
-			if not line:
-				break
-			line = parse_source_line(line)
-			if line is not None:
-				source_list.append(line)
-		return source_list
-
+#this runs forever, and continuously updates data sources and stuff
+def main_event_loop(params):
+	global coinList, sources, exc
 	
-#split the line up into components and 
-def parse_source_line(line):
-	h = hashlib.sha1()
+	updateCoinList(coinList,sources)			#grab first batch of data before entering event loop
 	
-	if line[0] == "#":
-		return None
+	EXIT_FLAG = False
+	init_time = time.time()
 	
-	line = line.strip('\n') #strip newlines from each source line
-	
-	#generate hash key for the URL we are currently scraping
-	h.update(line)
-	h= h.hexdigest()
-	
-	temp = line.split(',')
-
-	source_dict = { 
-	temp[0]: temp[1],			#host, e.g. coinwarz.com
-	temp[2]: temp[3],			#port, 
-	temp[4]: temp[5],			#actual page with the data we want, e.g. /cryptocurrency
-	"hash":h						#hash key
-							}
-	return source_dict
-
-def run_parse_chain(source):
-	new_data = {}
-	found_data = False
-	
-	current_chain = pc.load_chain(source["hash"])			#load the current parse chain for the target source
-	response = get_raw_data(source["host"] + ":" + source["port"], source["page"])						#get raw data from source
-	new_data["source"] = source
-	new_data["response"] = response									#set new data key to initial response data
-	
-	
-	for i in range(len(current_chain)):									#go through list of search strings and find the data we want, then store it in new_data dictionary
-		parsed_link = current_chain[i].split(':', 1)			
-		key_from, key_to = parsed_link[0].split(',')
-		search_string = parsed_link[1].strip()
+	while not EXIT_FLAG:
+		timer_updateData = Thread(target = updateCoinList,  args = (coinList, sources))
+		timer_updateData.start()
+		timer_updateData.join()				#ensures that the main event loop is blocked from continuing
 		
-		key_to = key_to.strip()
-		key_from = key_from.strip()
+		#loop frequency must be greater than or equal to the longest thread frequency
+		print "Current time:", time.time()
 		
-		current_re = re.compile(search_string)
+		#coinList["xmr"].summary()
+		#print coinList["xmr"]["price"]
 		
-		if type(new_data[key_from]) == str:
-			current_result = re.findall(current_re, new_data[key_from])
-		elif type(new_data[key_from]) == list:
-			for i in range(len(new_data[key_from])):
-				current_result = re.search(current_re, new_data[key_from][i])
-				if current_result:
-					break
-					
-		if current_result:
-			if type(current_result) ==  list:
-				new_data[key_to] = current_result
-			else:
-				new_data[key_to] = current_result.group(0)
-			found_data = True
-			
-	if found_data:
-		return new_data
-	else: 
-		return None
-
-
-def updateCoinData(coin, sources, subset=[]):
-	if subset == []:
-		for i in range(1, len(sources)):
-			print sources[i]
-			new_data = run_parse_chain(sources[i])
-			coin.update(new_data)
-	else:
-		for i in (coin["subset"]):
-			new_data = run_parse_chain(sources[i])
-			coin.update(new_data)
+		elapsed = time.time()-init_time
+		time.sleep(params["loop_frequency"])
+		if  elapsed >= run_limit:
+			print "Exiting after ", elapsed, " seconds."
+			EXIT_FLAG = True
 		
-	
-def updateCoinList (coinList, sources):
-	for i in range(len(coinList)):
-		print "Updating ", coinList[i]["name"], " data..."
-		updateCoinData(coinList[i], sources, coinList[i]["subset"])
-	
-	
 #entry point
 def main():
-	sources = load_sources()								  #load an external list with the urls we want to crawl
+	global sources, exc, coinList
+	
+	event_loop_parameters = {
+	"update_frequency":1,
+	"loop_frequency":0.1,
+	"watch_list":["price"]
+	}
+	
+	sources = load_sources(source_file)		 #load an external list with the urls we want to crawl
 	#print sources
 	
 	# subset specifies the indices of sources that each coin type will pull new data from
@@ -125,18 +66,10 @@ def main():
 	eth = coin("ETH", subset = [0,2])						
 	xmr = coin("XMR", subset = [0,3])		
 	
-	#create list to store all coins we are working with
-	coinList = [btc, eth, xmr]
+	coinList = {"btc":btc, "eth":eth, "xmr":xmr}			#create list to store all coins we are working with
+	exc = exchange()					#class wrapper for shapeshift api
 	
-	#update all coin data from whatever sources they are set up to pull from
-	updateCoinList(coinList, sources)
-	
-	btc.summary()
-	#eth.summary()
-	#xmr.summary()
-	
-	#create exchange instance for trading
-	exc = exchange()										#class wrapper for shapeshift api
+	main_event_loop(event_loop_parameters)
 	
 	#to make an api call, specify the path of api call (see below), followed by the pair of coins
 	#sample shapeshift api calls

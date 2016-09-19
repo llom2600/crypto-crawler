@@ -19,7 +19,7 @@ class coin(object):
 			self.coin_name = coin_name
 			self.coin_properties = {}
 			
-			self.coin_properties["name"] = self.coin_name
+			self.coin_properties["coin_name"] = self.coin_name
 			self.coin_properties["subset"] = subset
 			self._loadwallets()				#load csv with current wallet addresses for this coin type and update inventory
 			
@@ -36,6 +36,10 @@ class coin(object):
 	
 	
 	def update(self, new_data):
+		if new_data == None:
+			print "Couldn't update data that time around."
+			return None
+		
 		""" get new data for this coin type, this is gonna have to be more robust to handle other types of data, but for now it'll do """
 		#print "Updating data from: ", new_data["source"]
 		numeric = re.compile(r'^\-?[0-9]+\.?[0-9]*')				
@@ -69,7 +73,7 @@ class coin(object):
 		for key, value in self.coin_properties.iteritems():
 			print key, ":", value
 		print "----------------------------------"
-
+		
 	def _inventory(self):
 		pass
 	""" return current amount we have of this coin (i kinda wanna pass in a csv of wallet addresses for each coin type or something) """
