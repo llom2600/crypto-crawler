@@ -42,8 +42,12 @@ class coin(object):
 		
 		""" get new data for this coin type, this is gonna have to be more robust to handle other types of data, but for now it'll do """
 		#print "Updating data from: ", new_data["source"]
-		numeric = re.compile(r'^\-?[0-9]+\.?[0-9]*')				
-		iter_data = new_data[self.coin_name]
+		numeric = re.compile(r'^\-?[0-9]+\.?[0-9]*')
+		
+		try:
+			iter_data = new_data[self.coin_name]
+		except KeyError as e:
+			return None
 		
 		#temporary fix to eval bug i've been having with AST literal_eval
 		if type(iter_data) == list:
@@ -74,12 +78,15 @@ class coin(object):
 			print key, ":", value
 		print "----------------------------------"
 		
-	def _inventory(self):
-		pass
-	""" return current amount we have of this coin (i kinda wanna pass in a csv of wallet addresses for each coin type or something) """
-	
 	def _loadwallets(self):
-		pass
+		self.wallet_list = {}
+		with open("./wallets/" +self.coin_name + "_stock.lst", 'r+') as f:
+			for line in f:
+				if not line:
+					break
+				if line is not None:
+					address, amount = line.rstrip('\n').split(':')
+					self.wallet_list[address] = float(amount)
 	
 def main():
 	bitcoin = coin("BTC")

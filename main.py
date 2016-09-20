@@ -2,18 +2,24 @@ import os, sys, re
 import sched, time
 from threading import Thread
 import urllib2
+import numpy as np
+import pyqtgraph as pg
 
 # add paths to search space, to make importing modules and data sets easier
 sys.path.append('./modules')
+sys.path.append('./visual')
+sys.path.append('./trends')
+sys.path.append('./wallets')
 sys.path.append('./data-sets')
 
 from util import *
 from coin import *
 from shapeshift import *
+from plot import *
 
 #global constants
 source_file = "sources.lst"
-run_limit = 30.0					#time to pull data in seconds
+run_limit = 120.0					#time to pull data in seconds
 
 #global objects
 sources = None
@@ -28,31 +34,55 @@ def main_event_loop(params):
 	
 	EXIT_FLAG = False
 	init_time = time.time()
+	timeVector = np.array([], dtype=float)
+	yVector = np.array([], dtype=float)
+	
+	#temporary plotting object to visualize data
+	pw = simplePlot()
 	
 	while not EXIT_FLAG:
-		timer_updateData = Thread(target = updateCoinList,  args = (coinList, sources))
-		timer_updateData.start()
-		timer_updateData.join()				#ensures that the main event loop is blocked from continuing
+		iteration_begin = time.time()
+		thread_updateData = Thread(target = updateCoinList,  args = (coinList, sources))
+		
+		thread_updateData.start()
+		thread_updateData.join()				#ensures that the main event loop is blocked from continuing
 		
 		#loop frequency must be greater than or equal to the longest thread frequency
-		print "Current time:", time.time()
+		#print "Current time:", time.time()
 		
-		#coinList["xmr"].summary()
+		coinList["btc"].summary()
 		#print coinList["xmr"]["price"]
 		
-		elapsed = time.time()-init_time
-		time.sleep(params["loop_frequency"])
-		if  elapsed >= run_limit:
-			print "Exiting after ", elapsed, " seconds."
-			EXIT_FLAG = True
+		total_elapsed = time.time() - init_time
+		iteration_elapsed = time.time() - iteration_begin
+		timeVector = np.append(timeVector, total_elapsed)
+		yVector = np.append(yVector, coinList["eth"]["price"])
+
+		#temporary mechanism to update data
+		pw.plot(timeVector, yVector, clear=True)
+		pg.QtGui.QApplication.processEvents()
 		
+		#print timeVector
+		#print yVector
+		
+		exc["rate", "btc_eth"]
+		
+		if iteration_elapsed < params["loop_frequency"]:
+			remaining_sleep = params["loop_frequency"] - iteration_elapsed
+			print "Remaining sleep:", remaining_sleep
+			time.sleep(remaining_sleep)
+			
+		if  total_elapsed >= run_limit:
+			print "Exiting after ", total_elapsed, " seconds."
+			EXIT_FLAG = True
+			pg.QtGui.QApplication.closeAllWindows()
 #entry point
 def main():
 	global sources, exc, coinList
 	
 	event_loop_parameters = {
 	"update_frequency":1,
-	"loop_frequency":0.1,
+	"loop_frequency":1.000,
 	"watch_list":["price"]
 	}
 	

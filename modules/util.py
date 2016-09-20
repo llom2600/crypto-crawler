@@ -1,9 +1,7 @@
-import re
+import re, time
 #useful functions
-import urllib
-import urllib2
+import urllib, urllib2
 import hashlib
-import time
 import threading
 
 import parse_chain as pc
@@ -74,7 +72,7 @@ def updateCoinList (coinList, sources):
 	print "Updating coin data..."
 	
 	for key,value in coinList.iteritems():
-		#print "Updating ", coinList[i]["coin_name"], " data..."
+		print "\t--- updating", coinList[key]["coin_name"], "data..."
 		updateCoinData(coinList[key], sources, coinList[key]["subset"])
 	
 		
