@@ -8,6 +8,16 @@ import parse_chain as pc
 
 ATTEMPT_FREQUENCY = 1.5
 
+def log_coin_data(coin, watchList):
+	cVector = ""
+	for i in range(len(watchList)):
+		cVector += str(coin[watchList[i]]) + ","
+	cVector = cVector.rstrip(",") + "\n"
+	with open("./data-sets/" + coin.coin_name + "_" + time.strftime("%d_%m_%Y") + ".csv", "a") as f:
+		f.write(cVector)
+	
+		
+
 def get_raw_data(foreign_host, link_path, proxy=False, method="GET", data = {}, headers = {}, attempts = 0):
 	attempts = attempts
 	attempt_limit = 3

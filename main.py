@@ -19,7 +19,7 @@ from plot import *
 
 #global constants
 source_file = "sources.lst"
-run_limit = 120.0					#time to pull data in seconds
+run_limit = 1800.0					#time to pull data in seconds
 
 #global objects
 sources = None
@@ -38,7 +38,7 @@ def main_event_loop(params):
 	yVector = np.array([], dtype=float)
 	
 	#temporary plotting object to visualize data
-	pw = simplePlot()
+	#pw = simplePlot()
 	
 	while not EXIT_FLAG:
 		iteration_begin = time.time()
@@ -50,22 +50,21 @@ def main_event_loop(params):
 		#loop frequency must be greater than or equal to the longest thread frequency
 		#print "Current time:", time.time()
 		
-		coinList["btc"].summary()
+		#coinList["btc"].summary()
 		#print coinList["xmr"]["price"]
 		
 		total_elapsed = time.time() - init_time
 		iteration_elapsed = time.time() - iteration_begin
-		timeVector = np.append(timeVector, total_elapsed)
-		yVector = np.append(yVector, coinList["eth"]["price"])
-
+		
+		if params["record_data"]:
+			for key,value in coinList.iteritems():
+				log_coin_data(coinList[key], params["watch_list"])
+		
 		#temporary mechanism to update data
-		pw.plot(timeVector, yVector, clear=True)
-		pg.QtGui.QApplication.processEvents()
+		#pw.plot(timeVector, yVector, clear=True)
+		#pg.QtGui.QApplication.processEvents()
 		
-		#print timeVector
-		#print yVector
-		
-		exc["rate", "btc_eth"]
+		#exc["rate", "btc_eth"]
 		
 		if iteration_elapsed < params["loop_frequency"]:
 			remaining_sleep = params["loop_frequency"] - iteration_elapsed
@@ -75,7 +74,7 @@ def main_event_loop(params):
 		if  total_elapsed >= run_limit:
 			print "Exiting after ", total_elapsed, " seconds."
 			EXIT_FLAG = True
-			pg.QtGui.QApplication.closeAllWindows()
+			#pg.QtGui.QApplication.closeAllWindows()
 #entry point
 def main():
 	global sources, exc, coinList
@@ -83,7 +82,8 @@ def main():
 	event_loop_parameters = {
 	"update_frequency":1,
 	"loop_frequency":1.000,
-	"watch_list":["price"]
+	"watch_list":["time","difficulty", "difficulty24", "mktcap", "block_reward", "exchange_rate",  "exchange_rate24",  "volume", "price"],
+	"record_data":True
 	}
 	
 	sources = load_sources(source_file)		 #load an external list with the urls we want to crawl
